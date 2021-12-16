@@ -15,6 +15,9 @@ def FC_la(input,out_size=None,name='FC',reuse=False):
                                           scope=name,reuse=reuse,activation_fn=None,weights_initializer=tf.contrib.layers.xavier_initializer())
   return out
 
+def conv2d(x, W):
+  return tf.nn.conv2d(x,W,strides=[1,1,1,1],padding='SAME')
+
 def CA(input,pool=tf.reduce_mean, activation_function=tf.nn.relu, squash=tf.nn.sigmoid,name=None,r=4,reuse=Fales):
   mu = pool(input,reduction_indices=[1,2],keep_dims=True)
   c = int(mu.get_shape()[-1])
@@ -50,4 +53,19 @@ def GSA(input,name=None):
   w = int(input.ger_shape()[-2])
   c = int(input.ger_shape()[-1])
   
+  
+  theta_w_conv = weight_variable([1,1,c,c])
+  theta_b_conv = bias_variable([c])
+  theta = conv2d(input,theta_w_conv)+theta_b_conv
+  theta = tf.reshape(theta,shape=[-1,h*w,c])
+  
+  phi_w_conv = weight_variable([1,1,c,c])
+  phi_b_conv = bias_variable([c])
+  phi = conv2d(input,phi_w_conv)+phi_b_conv
+  phi = tf.reshape(phi,shape=[-1,h*w,c])
+  f = tf.matmul(theta, phi, transpose_b=True)
+  
+  phi_shape = phi.get_shape().as_list()
+  f = tf.reshape(f, shape=[-1,h*w,phi_shape[-1])
+                           
                                       
