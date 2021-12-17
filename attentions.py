@@ -66,6 +66,18 @@ def GSA(input,name=None):
   f = tf.matmul(theta, phi, transpose_b=True)
   
   phi_shape = phi.get_shape().as_list()
-  f = tf.reshape(f, shape=[-1,h*w,phi_shape[-1])
+  f = tf.reshape(f, shape=[-1,h*w,phi_shape[-1]])
+  f = tf.softmax(f, axis=-1)
+  
+  g_w_conv = weight_variable([1,1,c,c])
+  g_b_conv = bias_variable([c])
+  g = conv2d(input, g_w_conv) + g_b_conv
+  y_new = tf.matmul(g, f, transpose_a=True, transpose_b=True)
+  g= tf.reshape(g,shape=[-1,h,w,c])
+  
+  y_m = tf.reshape(y_new, shape=[-1,h,w,c])
+  unary_total = y_m
+  out = input + unary_total
+  return out
                            
                                       
